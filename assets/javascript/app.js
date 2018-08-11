@@ -37,7 +37,7 @@ function updateTrainTimes(){
     $("#trainData").empty();
     database.ref().on("child_added", function(snapshot){
 
-        var newTrain = snapshot.val().TrainName;
+        var newTrain = snapshot.val().Name;
         var newDestination = snapshot.val().Destination;
         var newStart = snapshot.val().Start;
         var newFrequency = snapshot.val().Frequency;
