@@ -25,22 +25,19 @@ function getTimes(firstTime, firstFrequency){
     var trainTimeRemainder = differenceInTime % firstFrequency;
     var MinutesUnitlArrival = firstFrequency - trainTimeRemainder;
 
-    // var tMinutesTillTrain = tFrequency - tRemainder;
-    var nextArrivalConverted = moment(nextTrainTiime).format("hh:mm a");
     var nextTrainTiime = moment().add(MinutesUnitlArrival, "minutes");
-    
-    var trainArrivalData = [MinutesUnitlArrival, nextArrivalConverted];
+    var nextTrainConverted = moment(nextTrainTiime).format("hh:mm a");
+    var trainArrivalData = [MinutesUnitlArrival, nextTrainConverted];
 
-    return trainArrivalData;
+    return trainArrivalData
 }
 
 function updateTrainTimes(){
     var trainId;
-    $("#trainData").ref().empty();
-    
+    $("#trainData").empty();
     database.ref().on("child_added", function(snapshot){
 
-        var newTrain = snapshot.val().Name;
+        var newTrain = snapshot.val().TrainName;
         var newDestination = snapshot.val().Destination;
         var newStart = snapshot.val().Start;
         var newFrequency = snapshot.val().Frequency;
@@ -57,6 +54,9 @@ function updateTrainTimes(){
         newTrainRow += "<td>" + newFrequency + "</td>";
         newTrainRow += "<td>" + nextArrival + "</td>";
         newTrainRow += "<td>" + minutesAway + "</td>";
+        newTrainRow += "<td><button type='button' class='btn btn-danger btn-sm' id='" + trainId +"'>remove</button></td>";
+        newTrainRow += "</tr>";
+
         $("#train-data").append(newTrainRow);
     });
 
@@ -64,9 +64,7 @@ function updateTrainTimes(){
 
 function submitTrain(event){
     event.preventDefault();
-    console.log("Train Submitted");
-    
-    
+    console.log("Submitted Train");
     var trainName =  $("#train-name").val().trim();
     var trainDestination = $("#train-destination").val().trim();
     var trainStart = $("#train-start").val().trim();
@@ -79,9 +77,10 @@ function submitTrain(event){
         Frequency: trainFrequency,
         Date: firebase.database.ServerValue.TIMESTAMP
     });
-    
     updateTrainTimes();
 }
+
+
 
 $(document).ready(function() {
     updateTrainTimes();
@@ -89,7 +88,7 @@ $(document).ready(function() {
     setInterval(displayTime, 1000);  
 
     $("#submit").click(submitTrain);
-    
+    $("#train-data").on("click", ".btn", removeTrain);
 });
 
 function removeTrain() {
@@ -97,4 +96,3 @@ function removeTrain() {
     database.ref().child(trainKey).remove();
     updateTrainTimes();
 }
-
